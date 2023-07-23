@@ -8,6 +8,48 @@ namespace ConsumerProducerTestApp.ClientSide
 {
     public static class MainUtitilty
     {
+        #region Regular call for comparison
+
+        public static string RunRegular(bool Wait = true)
+        {
+            var collection = Enumerable.Range(1, 300).ToList();
+            var heavyResponse = new HeavyResponse();
+            heavyResponse.Wait = Wait;
+
+            var stopwatch = new Stopwatch();
+            var builder = new StringBuilder();
+            var intList = new List<int>();
+
+            stopwatch.Start();
+
+            foreach (var item in collection)
+            {
+                intList.Add(heavyResponse.GetResponse(item));
+            }
+
+            stopwatch.Stop();
+            var elapsedTime1 = stopwatch.Elapsed;
+
+            var translator = new HeavyTranslator();
+            translator.Wait = Wait;
+            stopwatch.Reset();
+            stopwatch.Start();
+
+            foreach (var item in intList)
+            {
+                var textValue = translator.Translate(item);
+                Console.WriteLine(textValue);
+                builder.Append(textValue);
+            }
+            var elapsedTime2 = stopwatch.Elapsed;
+            Console.WriteLine($"Process one: {elapsedTime1} Process two {elapsedTime2}");
+            return builder.ToString();
+        }
+
+        #endregion Regular call for comparison
+
+        #region Async call, regular result processing
+
         public static async Task<string> RunAsync(bool Wait = true)
         {
             var collection = Enumerable.Range(1, 300).ToList();
@@ -47,41 +89,9 @@ namespace ConsumerProducerTestApp.ClientSide
             return builder.ToString();
         }
 
-        public static string Run(bool Wait = true)
-        {
-            var collection = Enumerable.Range(1, 300).ToList();
-            var heavyResponse = new HeavyResponse();
-            heavyResponse.Wait = Wait;
+        #endregion Async call, regular result processing
 
-            var stopwatch = new Stopwatch();
-            var builder = new StringBuilder();
-            var intList = new List<int>();
-
-            stopwatch.Start();
-
-            foreach (var item in collection)
-            {
-                intList.Add(heavyResponse.GetResponse(item));
-            }
-
-            stopwatch.Stop();
-            var elapsedTime1 = stopwatch.Elapsed;
-
-            var translator = new HeavyTranslator();
-            translator.Wait = Wait;
-            stopwatch.Reset();
-            stopwatch.Start();
-
-            foreach (var item in intList)
-            {
-                var textValue = translator.Translate(item);
-                Console.WriteLine(textValue);
-                builder.Append(textValue);
-            }
-            var elapsedTime2 = stopwatch.Elapsed;
-            Console.WriteLine($"Process one: {elapsedTime1} Process two {elapsedTime2}");
-            return builder.ToString();
-        }
+        #region Implemented Producer-Consumer patter with WaitAll
 
         public static string RunProducerConsumer(bool Wait = true)
         {
@@ -111,9 +121,6 @@ namespace ConsumerProducerTestApp.ClientSide
 
             Task[] translatingTasks =
         {
-                Task.Run(() => translateQueue.Translate()),
-                Task.Run(() => translateQueue.Translate()),
-                Task.Run(() => translateQueue.Translate()),
                 Task.Run(() => translateQueue.Translate())
             };
             Task.WaitAll(translatingTasks);
@@ -129,4 +136,6 @@ namespace ConsumerProducerTestApp.ClientSide
             return builder.ToString();
         }
     }
+
+    #endregion Implemented Producer-Consumer patter with WaitAll
 }

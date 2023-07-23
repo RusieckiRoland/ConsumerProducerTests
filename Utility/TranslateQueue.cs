@@ -22,9 +22,8 @@ namespace ConsumerProducerTestApp.Utility
         {
             foreach (var item in _translateQueue.GetConsumingEnumerable())
             {
-                var translateUnit = _translateQueue.Take();
-                var translatedValue = _heavyTranslator.Translate(translateUnit.value);
-                _resultDictionary.TryAdd(translateUnit.key, translatedValue);
+                var translatedValue = _heavyTranslator.Translate(item.value);
+                _resultDictionary.TryAdd(item.key, translatedValue);
             }
 
             //regular implementation

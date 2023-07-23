@@ -1,5 +1,5 @@
 ﻿using ConsumerProducerTestApp.ClientSide;
 
+//MainUtitilty.RunRegular();
 //await MainUtitilty.RunAsync();
-//MainUtitilty.Run();
 MainUtitilty.RunProducerConsumer();
