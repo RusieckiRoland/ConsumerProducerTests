@@ -112,6 +112,11 @@ namespace ConsumerProducerTestApp.ClientSide
                 loadingTasks.Add(heavyResponse.GetResponseForConsumer(item, translateQueue));
             }
 
+            Task[] translatingTasks =
+        {
+                Task.Run(() => translateQueue.Translate())
+            };
+
             Task.WaitAll(loadingTasks.ToArray());
             stopwatch.Stop();
             var elapsedTime1 = stopwatch.Elapsed;
@@ -119,10 +124,6 @@ namespace ConsumerProducerTestApp.ClientSide
             stopwatch.Reset();
             stopwatch.Start();
 
-            Task[] translatingTasks =
-        {
-                Task.Run(() => translateQueue.Translate())
-            };
             Task.WaitAll(translatingTasks);
 
             conDictionary.ToList().ForEach(element =>
